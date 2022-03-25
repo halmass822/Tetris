@@ -1,122 +1,34 @@
-function generateElement(elementType, elementId = null, elementContent = '', elementStyle = {},){
-    let outputElement = document.createElement(elementType);
-    outputElement.id = elementId;
-    outputElement.innerHTML = elementContent;
-    Object.assign(outputElement.style, elementStyle);
-    return outputElement;
-}
+//Generate a 7x9 grid, each element having its respective coordinate as its id
+//Nested for loop, outer layer creates the row, inner loop fills the row with the tiles
+//All generated tiles get added to a generated tiles array
+//Grid will then be appended to an existing div
 
-function appendToBody(inputElement){
-    document.body.appendChild(inputElement);
-}
+const gridTileStyle = { width: '50px', height: '50px', display: 'inline-block', border: '1px solid gray', margin: '0'};
+let generatedTiles = [];
 
-const tileStyle = { width: '50px', height: '50px', display: 'inline-block', border: '2px solid black', margin: '5px'}
-
-function generateGrid(gridWidth, gridHeight){
-    let outputGrid = document.createElement('div');
-    for (let i = 0; i < gridHeight; i++) {
+function generateGrid(width, height){
+    let output = document.createElement('div');
+    output.style.border = '2px solid black';
+    output.style.margin = '25px auto';
+    output.style.display = 'inline-block';
+    for( i = 0; i < height; i++ ){
         let row = document.createElement('div');
-        for (let j = 0; j < gridWidth; j++) {
-            let genElementId = (
-                (j + 1).toString() + (gridHeight-i).toString()
-            )
-            let genTile = (generateElement('p',genElementId,'',tileStyle));
-            row.appendChild(genTile);
+        row.style.height = '52px';
+        for( j = 0; j < width; j++){
+            let tileElement = document.createElement('p');
+
+            //grid is created top-down so the id is calculated such that bottom left grid tile is 11, stored as a string
+            let generateId = [j + 1].toString() + [height - i].toString();
+            tileElement.id = generateId;
+
+            Object.assign(tileElement.style, gridTileStyle);
+            generatedTiles.push(tileElement);
+            row.appendChild(tileElement);
         }
-        outputGrid.appendChild(row);
+        output.appendChild(row);
     }
-    return outputGrid;
+    console.log(`Generated ${width} by ${height} grid`);
+    return output;
 }
 
-appendToBody(generateGrid(7,7));
-
-tetraminoPosition = '47';
-document.getElementById(tetraminoPosition).style.backgroundColor = '#A9A9A9';
-
-let filledTiles = [];
-
-appendToBody(generateElement('p','tetraminoPos',tetraminoPosition,{ fontWeight: 'bold', textAlign: 'center' },));
-
-let movementAllowed = true;
-
-function moveTetra(movementInput){
-    movementInput = movementInput.toLowerCase();
-    document.getElementById(tetraminoPosition).style.backgroundColor = '';
-    let xCoordinate = Number(tetraminoPosition.slice(0,1));
-    console.log(`initial xCoordinate is ${xCoordinate}`);
-    let yCoordinate = Number(tetraminoPosition.slice(-1));
-    console.log(`initial yCoordinate is ${yCoordinate}`);
-    let newYCoord;
-    let newXCoord;
-    let proposedPosition;
-    switch(movementInput){
-        case 's':
-            newYCoord = yCoordinate - 1;
-            proposedPosition = xCoordinate.toString() + newYCoord.toString();
-            console.log(`proposed position is ${proposedPosition}`);
-            if(filledTiles.includes(proposedPosition)  || newYCoord <= 0){
-                console.log(`proposed position is filled, ignoring input`)
-            } else {
-                yCoordinate = newYCoord;
-            }         
-        break;
-        case 'd':
-            newXCoord = xCoordinate + 1;
-            proposedPosition = newXCoord.toString() + yCoordinate.toString();
-            console.log(`proposed position is ${proposedPosition}`);
-            if(filledTiles.includes(proposedPosition) || newXCoord >= 8){
-                console.log(`proposed position is filled, ignoring input`)
-            } else {
-                xCoordinate = newXCoord;
-            } 
-        break;
-        case 'a':
-            newXCoord = xCoordinate - 1;
-            proposedPosition = newXCoord.toString() + yCoordinate.toString();
-            console.log(`proposed position is ${proposedPosition}`);
-            if(filledTiles.includes(proposedPosition) || newXCoord <= 0){
-                console.log(`proposed position is filled, ignoring input`)
-            } else {
-                xCoordinate = newXCoord;
-            } 
-        break;
-        default:
-            console.log(`input ${movementInput} ignored`);
-        break;
-    }
-    let newPosition = xCoordinate.toString() + yCoordinate.toString();
-    console.log(`new x and y coords are ${xCoordinate} and ${yCoordinate} newPosition is ${newPosition}`)
-    document.getElementById(newPosition).style.backgroundColor = '#A9A9A9';
-    tetraminoPosition = newPosition;
-    document.getElementById('tetraminoPos').innerHTML = tetraminoPosition;
-}
-
-var fallingTetra = null;
-
-function dropTetra() {
-    let oldPosition = tetraminoPosition;
-    let newPosition = oldPosition[0] + (Number(oldPosition[1])-1).toString();
-    console.log(`old and new positions are ${oldPosition} and ${newPosition}`);
-    if (tetraminoPosition[1] === '1' || filledTiles.includes(newPosition)) {
-        filledTiles.push(oldPosition);
-        tetraminoPosition = '47';
-        document.getElementById(tetraminoPosition).style.backgroundColor = '#A9A9A9';
-    } else {
-        moveTetra('s');
-    }
-    document.getElementById('tetraminoPos').innerHTML = tetraminoPosition;
-}
-
-function fallingState(inputBool) {
-    if(inputBool) {
-        fallingTetra = setInterval(dropTetra, 500);
-    } else {
-        clearInterval(fallingTetra);
-    }
-}
-
-fallingState(true);
-
-document.body.addEventListener('keypress', (event) => {
-    moveTetra(event.key);
-})
+document.getElementById('playingGrid').appendChild(generateGrid(7,9));
