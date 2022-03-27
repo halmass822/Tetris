@@ -3,8 +3,10 @@
 //All generated tiles get added to a generated tiles array
 //Grid will then be appended to an existing div
 
-const gridTileStyle = { width: '50px', height: '50px', display: 'inline-block', border: '1px solid gray', margin: '0'};
 let generatedTiles = [];
+let filledTiles = [];
+let tetraminoPosition;
+let movementAllowed = false;
 
 function generateGrid(width, height){
     let output = document.createElement('div');
@@ -16,12 +18,11 @@ function generateGrid(width, height){
         row.style.height = '52px';
         for( j = 0; j < width; j++){
             let tileElement = document.createElement('p');
-
+            tileElement.className = 'gridTile'; 
             //grid is created top-down so the id is calculated such that bottom left grid tile is 11, stored as a string
-            let generateId = [j + 1].toString() + [height - i].toString();
-            tileElement.id = generateId;
-
-            Object.assign(tileElement.style, gridTileStyle);
+            let generatedId = [j + 1].toString() + [height - i].toString();
+            tileElement.id = generatedId;
+            //created element is added to the generated tiles array then appended to the row
             generatedTiles.push(tileElement);
             row.appendChild(tileElement);
         }
@@ -29,6 +30,66 @@ function generateGrid(width, height){
     }
     console.log(`Generated ${width} by ${height} grid`);
     return output;
+}
+
+//tile position represented by respective tile having a grey background color of #A9A9A9
+//function returns current tile position to white and updates current position and logs the change
+
+function updateTetraminoPosition(newPosition) {
+    document.getElementById(tetraminoPosition).style.backgroundColor = white;
+    document.getElementById(newPosition).style.backgroundColor = '#A9A9A9';
+    console.log(`Tetramino position moved from ${tetraminoPosition} to ${newPosition}`);
+    tetraminoPosition = newPosition;
+}
+
+//global variable movementAllowed disables / enables movement of the tile
+//function move tile checks if the proposed position is filled by another tile or out of bounds, only accepts a s d as inputs
+
+function moveTile(movementInput) {
+    if(movementAllowed) {
+
+        if(/[asd]/.test(movementInput)){
+            
+            let currentXCoord = Number(tetraminoPosition[0]);
+            let currentYCoord = Number(tetraminoPosition[1]);
+            let proposedXCoord;
+            let proposedYCoord;
+            let proposedPosition;
+            switch(movementInput) {
+                case 'a':
+                    proposedXCoord = currentXCoord - 1;
+                    proposedYCoord = currentYCoord;
+                    break;
+                case 'd':
+                    proposedXCoord = currentXCoord + 1;
+                    proposedYCoord = currentYCoord;
+                    break;     
+                case 's':
+                    proposedXCoord = currentXCoord;
+                    proposedYCoord = currentYCoord - 1;
+                    break;              
+                default:
+                    console.log(`error - check moveTile() regex`);
+            }
+            proposedPosition = proposedXCoord.toString() + proposedYCoord.toString();
+            
+            //checking if proposed position is out of bounds OR filled
+            if(proposedXCoord < 1 || proposedXCoord > 7 || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
+                filledTiles.push(proposedPosition);
+                console.log(`proposed position ${proposedPostion} is out of bounds or filled`);
+                return 'movement blocked';
+            } else {
+                updateTetraminoPosition(proposedPosition);
+                return 'tile moved';
+            }
+
+        } else {
+            console.log(`input "${movementInput}" ignored`);
+        }
+
+    } else {
+        console.log(`movement disallowed, input ignored`);
+    }
 }
 
 document.getElementById('playingGrid').appendChild(generateGrid(7,9));
