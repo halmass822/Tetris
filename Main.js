@@ -31,7 +31,7 @@ function generateGrid(width, height){
 //tile position represented by respective tile having a grey background color of #A9A9A9
 //function returns current tile position to white and updates current position and logs the change
 function updateTetraminoPosition(newPosition) {
-    document.getElementById(tetraminoPosition).style.backgroundColor = white;
+    document.getElementById(tetraminoPosition).style.backgroundColor = 'white';
     document.getElementById(newPosition).style.backgroundColor = '#A9A9A9';
     console.log(`Tetramino position moved from ${tetraminoPosition} to ${newPosition}`);
     tetraminoPosition = newPosition;
@@ -70,10 +70,11 @@ function moveTile(movementInput) {
                     console.log(`error - check moveTile() regex`);
             }
             proposedPosition = proposedXCoord.toString() + proposedYCoord.toString();
-            
+            console.log(`proposed coords are ${proposedXCoord} and ${proposedYCoord}. proposed position is ${proposedPosition}`);
             //checking if proposed position is out of bounds OR filled
             if(proposedXCoord < 1 || proposedXCoord > 7 || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
-                console.log(`proposed position ${proposedPostion} is out of bounds or filled`);
+                console.log(`proposed position ${proposedPosition} is out of bounds or filled`);
+                console.log(`${(proposedXCoord < 1)} ${proposedXCoord > 7} ${proposedYCoord < 1} ${filledTiles.includes(proposedPosition)}`);
                 return 'movement blocked';
             } else {
                 updateTetraminoPosition(proposedPosition);
@@ -97,6 +98,8 @@ function dropTile() {
     if(newPosition = 'movement Blocked'){
         filledTiles.push(tetraminoPosition);
         updateTetraminoPosition('49');
+    } else {
+        updateTetraminoPosition(newPosition);
     }
     if(filledTiles.includes('49')){
         movementAllowed = false;
@@ -112,7 +115,7 @@ function dropTile() {
 let fallingTetra;
 function fallingState(inputBool) {
     if(inputBool) {
-        fallingTetra = setInterval(dropTetra, 500);
+        fallingTetra = setInterval(dropTile, 500);
     } else {
         clearInterval(fallingTetra);
     }
@@ -131,3 +134,6 @@ function startGame() {
 
 document.getElementById('playingGrid').appendChild(generateGrid(7,9));
 
+document.body.addEventListener('keypress', (event) => {moveTile(event.key)});
+document.getElementById('startButton').addEventListener('click', startGame);
+document.getElementById('replayButton').addEventListener('click', startGame);
