@@ -95,16 +95,16 @@ function moveTile(movementInput) {
 //ends the game if the tile stops at position 49
 function dropTile() {
     let newPosition = moveTile('s');
-    if(newPosition = 'movement Blocked'){
+    if(newPosition === 'movement blocked'){
+        console.log(`movement blocked, position ${tetraminoPosition} is now filled`);
         filledTiles.push(tetraminoPosition);
-        updateTetraminoPosition('49');
-    } else {
-        updateTetraminoPosition(newPosition);
+        tetraminoPosition = '49';
+        document.getElementById('49').style.backgroundColor = '#A9A9A9';
     }
     if(filledTiles.includes('49')){
         movementAllowed = false;
         fallingState(false);
-        document.getElementById('gameOverScreen').style.display = 'absolute';
+        document.getElementById('gameOverScreen').style.display = 'block';
     }
 }
 
@@ -123,7 +123,8 @@ function fallingState(inputBool) {
 
 //function resets tile position to 49, clears all the tile backgrounds back to white, hides the game over / game title screen and starts the tile falling
 function startGame() {
-    filledTiles.forEach((x) => {document.getElementById(x).style.backgroundColor = white});
+    filledTiles.forEach((x) => {document.getElementById(x).style.backgroundColor = 'white'});
+    filledTiles = [];
     updateTetraminoPosition('49');
     console.log(`startGame() triggered`)
     document.getElementById(`gameOverScreen`).style.display = "none";
