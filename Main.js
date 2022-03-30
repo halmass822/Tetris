@@ -108,8 +108,6 @@ function dropTile() {
     }
 }
 
-
-
 //function to start/stop the tile falling
 //uses a global variable to store the state
 let fallingTetra;
@@ -132,6 +130,33 @@ function startGame() {
     fallingState(true);
     movementAllowed = true;
 }
+
+
+//function to return an array of all elements in a particular row
+function getRowElements(targetRowHeight, gridWidth) {
+    let outputArray = [];
+    for( i = 0; i < gridWidth ; i++) {
+        let generatedElement = (i + 1).toString() + targetRowHeight.toString();
+        outputArray.push(generatedElement);
+    }
+    return outputArray;
+}
+
+//array of arrays of all the elements in the grid by row
+const row1Elements = getRowElements(1,7);
+const row2Elements = getRowElements(2,7);
+const row3Elements = getRowElements(3,7);
+const row4Elements = getRowElements(4,7);
+const row5Elements = getRowElements(5,7);
+const row6Elements = getRowElements(6,7);
+const row7Elements = getRowElements(7,7);
+const row8Elements = getRowElements(8,7);
+const row9Elements = getRowElements(9,7);
+
+const allRowElements = [row1Elements, row2Elements, row3Elements, row4Elements, row5Elements, row6Elements, row7Elements, row8Elements, row9Elements];
+
+console.log(allRowElements);
+
 
 document.getElementById('playingGrid').appendChild(generateGrid(7,9));
 
