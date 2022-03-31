@@ -74,7 +74,6 @@ function moveTile(movementInput) {
             //checking if proposed position is out of bounds OR filled
             if(proposedXCoord < 1 || proposedXCoord > 7 || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
                 console.log(`proposed position ${proposedPosition} is out of bounds or filled`);
-                console.log(`${(proposedXCoord < 1)} ${proposedXCoord > 7} ${proposedYCoord < 1} ${filledTiles.includes(proposedPosition)}`);
                 return 'movement blocked';
             } else {
                 updateTetraminoPosition(proposedPosition);
@@ -101,6 +100,7 @@ function dropTile() {
         tetraminoPosition = '49';
         document.getElementById('49').style.backgroundColor = '#A9A9A9';
     }
+    score();
     if(filledTiles.includes('49')){
         movementAllowed = false;
         fallingState(false);
@@ -157,6 +157,78 @@ const allRowElements = [row1Elements, row2Elements, row3Elements, row4Elements, 
 
 console.log(allRowElements);
 
+//global variable for user's score
+let userScore = 0;
+
+//shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
+function shiftTilesDown(inputTargetRow){
+    let targetTiles = filledTiles.filter((x) => {
+        Number(x[1]) > inputTargetRow;
+    });
+    console.log(`target tiles to shift down are ${targetTiles}`);
+    let newTilePositions = [];
+    targetTiles.forEach((x) => {
+        newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
+    });
+    console.log(`target tiles new positions are ${newTilePositions}`);
+    targetTiles.forEach((x) => {
+        document.getElementById(x).style.backgroundColor = 'white';
+    });
+    newTilePositions.forEach((x) => {
+        document.getElementById(x).style.backgroundColor = '#A9A9A9';
+    });
+}
+
+//function to check if a row is filled, clear the row from filled tiles and reset background color to white and increment user score
+function score() {
+    console.log(filledTiles);
+    let scoringTiles = [];
+    let scoringTileRows = [];
+    let numberOfScoringRows = 0;
+    if(row1Elements.every((x) => {
+        filledTiles.includes(x)
+    })){
+        console.log(`row 1 is filled!!`);
+    }
+    /*allRowElements.forEach((rowElements) => {
+        //if all the tiles in the row are filled (in the filledTiles array) push the array into the scoringTiles array
+        if (rowElements.every((tile) => {
+                filledTiles.includes(tile);
+                console.log(`checking tile ${tile}`);
+            })) {
+                scoringTiles.push(rowElements);
+                scoringTileRows.push(tile[1]);
+                numberOfScoringRows++;
+
+            }
+    })*/
+    //console.log(`scoringTiles detected: ${scoringTiles}\nnumber of scoring rows: ${numberOfScoringRows}`);
+    //reset scoring tile color, remove from filledTiles array, shift all tiles above down
+    scoringTiles.forEach((row) => {
+        row.forEach((tile) => {
+            document.getElementById(tile).style.backgroundColor = 'white';
+            let tileIndex = filledTiles.findIndex((x) => {x === tile});
+            filledTiles.splice(tileIndex,1);
+        })
+        shiftTilesDown(row[0][1]);
+    })
+    switch(numberOfScoringRows){
+        case 1:
+            userScore += 40;
+        break;
+        case 2:
+            userScore += 100;
+        break;
+        case 3:
+            userScore += 300;
+        break;
+        case 4:
+            userScore += 1200;
+        break;
+        default:
+        break;
+    }
+}
 
 document.getElementById('playingGrid').appendChild(generateGrid(7,9));
 
