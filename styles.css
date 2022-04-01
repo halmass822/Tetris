@@ -52,3 +52,22 @@ button {
     top: -5px;
     bottom: 5px;
 }
+
+#scoreboard {
+  display: inline-block;
+  text-align: center;
+  border: 2px solid black;
+  border-radius: 5px;
+  background-color: #80FFFF;
+  padding: 10px 75px;
+}
+
+#scoreboard h2 {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+#scoreboard p {
+  font-weight: bold;
+  font-size: 20px;
+}

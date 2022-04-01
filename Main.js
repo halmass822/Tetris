@@ -70,7 +70,6 @@ function moveTile(movementInput) {
                     console.log(`error - check moveTile() regex`);
             }
             proposedPosition = proposedXCoord.toString() + proposedYCoord.toString();
-            console.log(`proposed coords are ${proposedXCoord} and ${proposedYCoord}. proposed position is ${proposedPosition}`);
             //checking if proposed position is out of bounds OR filled
             if(proposedXCoord < 1 || proposedXCoord > 7 || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
                 console.log(`proposed position ${proposedPosition} is out of bounds or filled`);
@@ -121,7 +120,7 @@ function fallingState(inputBool) {
 
 //function resets tile position to 49, clears all the tile backgrounds back to white, hides the game over / game title screen and starts the tile falling
 function startGame() {
-    filledTiles.forEach((x) => {document.getElementById(x).style.backgroundColor = 'white'});
+    generatedTiles.forEach((x) => document.getElementById(x).style.backgroundColor = 'white');
     filledTiles = [];
     updateTetraminoPosition('49');
     console.log(`startGame() triggered`)
@@ -157,14 +156,15 @@ const allRowElements = [row1Elements, row2Elements, row3Elements, row4Elements, 
 
 console.log(allRowElements);
 
-//global variable for user's score
+//global variable for user's score and function to update it
 let userScore = 0;
+function updateScore() {
+    document.getElementById('userScore').innerHTML = userScore;
+};
 
 //shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
 function shiftTilesDown(inputTargetRow){
-    let targetTiles = filledTiles.filter((x) => {
-        Number(x[1]) > inputTargetRow;
-    });
+    let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
     console.log(`target tiles to shift down are ${targetTiles}`);
     let newTilePositions = [];
     targetTiles.forEach((x) => {
@@ -181,28 +181,20 @@ function shiftTilesDown(inputTargetRow){
 
 //function to check if a row is filled, clear the row from filled tiles and reset background color to white and increment user score
 function score() {
-    console.log(filledTiles);
     let scoringTiles = [];
     let scoringTileRows = [];
     let numberOfScoringRows = 0;
-    if(row1Elements.every((x) => {
-        filledTiles.includes(x)
-    })){
-        console.log(`row 1 is filled!!`);
-    }
-    /*allRowElements.forEach((rowElements) => {
+    allRowElements.forEach((rowElements) => {
         //if all the tiles in the row are filled (in the filledTiles array) push the array into the scoringTiles array
         if (rowElements.every((tile) => {
-                filledTiles.includes(tile);
-                console.log(`checking tile ${tile}`);
+                return filledTiles.includes(tile);
             })) {
                 scoringTiles.push(rowElements);
-                scoringTileRows.push(tile[1]);
+                scoringTileRows.push(rowElements[0][1]);
                 numberOfScoringRows++;
-
             }
-    })*/
-    //console.log(`scoringTiles detected: ${scoringTiles}\nnumber of scoring rows: ${numberOfScoringRows}`);
+    })
+    console.log(`scoringTiles detected: ${scoringTiles}\nscoringRows detected: ${scoringTileRows}\nnumber of scoring rows: ${numberOfScoringRows}`);
     //reset scoring tile color, remove from filledTiles array, shift all tiles above down
     scoringTiles.forEach((row) => {
         row.forEach((tile) => {
@@ -228,6 +220,7 @@ function score() {
         default:
         break;
     }
+    updateScore();
 }
 
 document.getElementById('playingGrid').appendChild(generateGrid(7,9));
