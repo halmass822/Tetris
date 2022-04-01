@@ -14,12 +14,12 @@ function generateGrid(width, height){
         row.style.height = '52px';
         for( j = 0; j < width; j++){
             let tileElement = document.createElement('p');
-            tileElement.className = 'gridTile'; 
             //grid is created top-down so the id is calculated such that bottom left grid tile is 11, stored as a string
             let generatedId = [j + 1].toString() + [height - i].toString();
             tileElement.id = generatedId;
             //created element is added to the generated tiles array then appended to the row
-            generatedTiles.push(tileElement);
+            generatedTiles.push(generatedId);
+            tileElement.className = 'gridTile';
             row.appendChild(tileElement);
         }
         output.appendChild(row);
@@ -27,6 +27,9 @@ function generateGrid(width, height){
     console.log(`Generated ${width} by ${height} grid`);
     return output;
 }
+
+//creating the grid and appending to the target div
+document.getElementById('playingGrid').appendChild(generateGrid(7,9));
 
 //tile position represented by respective tile having a grey background color of #A9A9A9
 //function returns current tile position to white and updates current position and logs the change
@@ -118,6 +121,7 @@ function fallingState(inputBool) {
     }
 }
 
+
 //function resets tile position to 49, clears all the tile backgrounds back to white, hides the game over / game title screen and starts the tile falling
 function startGame() {
     generatedTiles.forEach((x) => document.getElementById(x).style.backgroundColor = 'white');
@@ -153,8 +157,6 @@ const row8Elements = getRowElements(8,7);
 const row9Elements = getRowElements(9,7);
 
 const allRowElements = [row1Elements, row2Elements, row3Elements, row4Elements, row5Elements, row6Elements, row7Elements, row8Elements, row9Elements];
-
-console.log(allRowElements);
 
 //global variable for user's score and function to update it
 let userScore = 0;
@@ -222,8 +224,6 @@ function score() {
     }
     updateScore();
 }
-
-document.getElementById('playingGrid').appendChild(generateGrid(7,9));
 
 document.body.addEventListener('keypress', (event) => {moveTile(event.key)});
 document.getElementById('startButton').addEventListener('click', startGame);
