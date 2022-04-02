@@ -36,8 +36,21 @@ document.getElementById('playingGrid').appendChild(generateGrid(7,9));
 function updateTetraminoPosition(newPosition) {
     document.getElementById(tetraminoPosition).style.backgroundColor = 'white';
     document.getElementById(newPosition).style.backgroundColor = '#A9A9A9';
-    console.log(`Tetramino position moved from ${tetraminoPosition} to ${newPosition}`);
     tetraminoPosition = newPosition;
+}
+
+//helper functions for recoloring and filling the represented tile
+function fillTile(targetId) {
+    targetElement = document.getElementById(targetId);
+    filledTiles.push(targetId);
+    targetElement.style.backgroundColor = '#A9A9A9';
+}
+
+function emptyTile(targetId) {
+    targetElement = document.getElementById(targetId);
+    tagetElement.style.backgroundColor = 'white';
+    let targetIndex = filledTiles.findIndex(targetId);
+    filledTiles.splice(targetIndex,1);
 }
 
 //global variable movementAllowed disables / enables movement of the tile
@@ -127,6 +140,8 @@ function startGame() {
     generatedTiles.forEach((x) => document.getElementById(x).style.backgroundColor = 'white');
     filledTiles = [];
     updateTetraminoPosition('49');
+    userScore = 0;
+    updateScore();
     console.log(`startGame() triggered`)
     document.getElementById(`gameOverScreen`).style.display = "none";
     document.getElementById(`gameTitleScreen`).style.display = "none";
@@ -166,6 +181,7 @@ function updateScore() {
 
 //shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
 function shiftTilesDown(inputTargetRow){
+    console.log(inputTargetRow);
     let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
     console.log(`target tiles to shift down are ${targetTiles}`);
     let newTilePositions = [];
@@ -196,7 +212,6 @@ function score() {
                 numberOfScoringRows++;
             }
     })
-    console.log(`scoringTiles detected: ${scoringTiles}\nscoringRows detected: ${scoringTileRows}\nnumber of scoring rows: ${numberOfScoringRows}`);
     //reset scoring tile color, remove from filledTiles array, shift all tiles above down
     scoringTiles.forEach((row) => {
         row.forEach((tile) => {
@@ -228,3 +243,9 @@ function score() {
 document.body.addEventListener('keypress', (event) => {moveTile(event.key)});
 document.getElementById('startButton').addEventListener('click', startGame);
 document.getElementById('replayButton').addEventListener('click', startGame);
+
+
+//DEBUGGING
+function debug1() {
+    ['11','21','31','41','51','61','42','43','32','33','12','13','14'].forEach((x) => fillTile(x));
+}
