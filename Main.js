@@ -202,24 +202,15 @@ function score() {
     let scoringTiles = [];
     let scoringTileRows = [];
     let numberOfScoringRows = 0;
+    //check if any rows are scoring, increment numberofscoringrows, push the scoring tiles, push the scoring rows
     allRowElements.forEach((rowElements) => {
-        //if all the tiles in the row are filled (in the filledTiles array) push the array into the scoringTiles array
-        if (rowElements.every((tile) => {
-                return filledTiles.includes(tile);
-            })) {
-                scoringTiles.push(rowElements);
-                scoringTileRows.push(rowElements[0][1]);
-                numberOfScoringRows++;
-            }
-    })
-    //reset scoring tile color, remove from filledTiles array, shift all tiles above down
-    scoringTiles.forEach((row) => {
-        row.forEach((tile) => {
-            document.getElementById(tile).style.backgroundColor = 'white';
-            let tileIndex = filledTiles.findIndex((x) => {x === tile});
-            filledTiles.splice(tileIndex,1);
-        })
-        shiftTilesDown(row[0][1]);
+        if(rowElements.every((x) => filledTiles.includes(x))){
+            numberOfScoringRows++;
+            scoringTiles = scoringTiles.concat(rowElements);
+            let scoringRow = rowElements[0][1];
+            scoringTileRows.push(scoringRow);
+            console.log(`detected scoring row elements are${rowElements}\ndetected scoring row is ${scoringRow}`);
+        }
     })
     switch(numberOfScoringRows){
         case 1:
