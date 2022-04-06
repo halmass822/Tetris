@@ -191,7 +191,7 @@ function updateScore() {
 
 //shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
 function shiftTilesDown(inputTargetRow){
-    console.log(inputTargetRow);
+    console.log(`target row to shift down is ${inputTargetRow}`);
     let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
     console.log(`target tiles to shift down are ${targetTiles}`);
     let newTilePositions = [];
@@ -221,6 +221,9 @@ function score() {
             scoringTileRows.push(scoringRow);
             console.log(`detected scoring row elements are${rowElements}\ndetected scoring row is ${scoringRow}`);
         }
+    scoringTiles.forEach((x) => emptyTile(x));
+    scoringTileRows.sort();
+    scoringTileRows.forEach((x) => shiftTilesDown(x));
     })
     switch(numberOfScoringRows){
         case 1:
