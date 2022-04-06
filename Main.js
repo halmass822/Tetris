@@ -42,15 +42,23 @@ function updateTetraminoPosition(newPosition) {
 //helper functions for recoloring and filling the represented tile
 function fillTile(targetId) {
     targetElement = document.getElementById(targetId);
-    filledTiles.push(targetId);
+    if(!filledTiles.includes(targetId)){
+        filledTiles.push(targetId);
+    }
     targetElement.style.backgroundColor = '#A9A9A9';
 }
 
 function emptyTile(targetId) {
     targetElement = document.getElementById(targetId);
-    tagetElement.style.backgroundColor = 'white';
-    let targetIndex = filledTiles.findIndex(targetId);
-    filledTiles.splice(targetIndex,1);
+    targetElement.style.backgroundColor = 'white';
+    let targetIndex = filledTiles.findIndex((x) => x === targetId);
+    if(targetIndex){
+        filledTiles.splice(targetIndex,1);
+    }
+}
+
+function debug2() {
+    ['11','22','32','71'].forEach((x) => emptyTile(x));
 }
 
 //global variable movementAllowed disables / enables movement of the tile
@@ -240,3 +248,6 @@ document.getElementById('replayButton').addEventListener('click', startGame);
 function debug1() {
     ['11','21','31','41','51','61','42','43','32','33','12','13','14'].forEach((x) => fillTile(x));
 }
+
+document.getElementById('debug1').addEventListener('click',debug1);
+document.getElementById('debug2').addEventListener('click',debug2);
