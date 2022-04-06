@@ -52,13 +52,15 @@ function emptyTile(targetId) {
     targetElement = document.getElementById(targetId);
     targetElement.style.backgroundColor = 'white';
     let targetIndex = filledTiles.findIndex((x) => x === targetId);
-    if(targetIndex){
+    if(targetIndex >= 0){
+        console.log(`index ${targetIndex} to be spliced, element is ${filledTiles[targetIndex]}`);
         filledTiles.splice(targetIndex,1);
     }
 }
 
 function debug2() {
     ['11','22','32','71'].forEach((x) => emptyTile(x));
+    console.log(`resultant filledTiles are ${filledTiles}`);
 }
 
 //global variable movementAllowed disables / enables movement of the tile
