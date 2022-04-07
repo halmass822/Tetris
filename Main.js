@@ -198,13 +198,16 @@ function shiftTilesDown(inputTargetRow){
     targetTiles.forEach((x) => {
         newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
     });
+    console.log(`newTilePositions are ${newTilePositions}`);
     console.log(`target tiles new positions are ${newTilePositions}`);
     targetTiles.forEach((x) => {
-        document.getElementById(x).style.backgroundColor = 'white';
+        emptyTile(x);
     });
+    console.log(`newTilePositions are ${newTilePositions}`);
     newTilePositions.forEach((x) => {
-        document.getElementById(x).style.backgroundColor = '#A9A9A9';
+        fillTile(x);
     });
+
 }
 
 //function to check if a row is filled, clear the row from filled tiles and reset background color to white and increment user score
@@ -222,7 +225,9 @@ function score() {
             console.log(`detected scoring row elements are${rowElements}\ndetected scoring row is ${scoringRow}`);
         }
     scoringTiles.forEach((x) => emptyTile(x));
-    scoringTileRows.sort();
+    //sorting the scoring rows by descending so the highest row runs shiftTilesDown() first
+    scoringTileRows.sort((a,b) => b - a);
+    console.log(`scoringTileRows are ${scoringTileRows}`);
     scoringTileRows.forEach((x) => shiftTilesDown(x));
     })
     switch(numberOfScoringRows){
@@ -254,5 +259,10 @@ function debug1() {
     ['11','21','31','41','51','61','42','43','32','33','12','13','14'].forEach((x) => fillTile(x));
 }
 
+function debug3() {
+    console.log(`filledTiles are ${filledTiles}`);
+}
+
 document.getElementById('debug1').addEventListener('click',debug1);
 document.getElementById('debug2').addEventListener('click',debug2);
+document.getElementById('debug3').addEventListener('click',debug3);
