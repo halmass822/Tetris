@@ -42,15 +42,24 @@ function updateTetraminoPosition(newPosition) {
 //helper functions for recoloring and filling the represented tile
 function fillTile(targetId) {
     targetElement = document.getElementById(targetId);
-    filledTiles.push(targetId);
+    if(!filledTiles.includes(targetId)){
+        filledTiles.push(targetId);
+    }
     targetElement.style.backgroundColor = '#A9A9A9';
 }
 
 function emptyTile(targetId) {
     targetElement = document.getElementById(targetId);
-    tagetElement.style.backgroundColor = 'white';
-    let targetIndex = filledTiles.findIndex(targetId);
-    filledTiles.splice(targetIndex,1);
+    targetElement.style.backgroundColor = 'white';
+    let targetIndex = filledTiles.findIndex((x) => x === targetId);
+    if(targetIndex >= 0){
+        filledTiles.splice(targetIndex,1);
+    }
+}
+
+function debug2() {
+    ['11','22','32','71'].forEach((x) => emptyTile(x));
+    console.log(`resultant filledTiles are ${filledTiles}`);
 }
 
 //global variable movementAllowed disables / enables movement of the tile
@@ -181,20 +190,26 @@ function updateScore() {
 
 //shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
 function shiftTilesDown(inputTargetRow){
-    console.log(inputTargetRow);
-    let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
-    console.log(`target tiles to shift down are ${targetTiles}`);
-    let newTilePositions = [];
-    targetTiles.forEach((x) => {
-        newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
-    });
-    console.log(`target tiles new positions are ${newTilePositions}`);
-    targetTiles.forEach((x) => {
-        document.getElementById(x).style.backgroundColor = 'white';
-    });
-    newTilePositions.forEach((x) => {
-        document.getElementById(x).style.backgroundColor = '#A9A9A9';
-    });
+    if(inputTargetRow.length > 0) {
+        console.log(`target row to shift down is ${inputTargetRow}`);
+        let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
+        console.log(`target tiles to shift down are ${targetTiles}`);
+        let newTilePositions = [];
+        targetTiles.forEach((x) => {
+            newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
+        });
+        console.log(`newTilePositions are ${newTilePositions}`);
+        console.log(`target tiles new positions are ${newTilePositions}`);
+        targetTiles.forEach((x) => {
+            console.log(`Tile ${x} emptied`)
+            emptyTile(x);
+        });
+        console.log(`newTilePositions are ${newTilePositions}`);
+        newTilePositions.forEach((x) => {
+            console.log(`Tile ${x} filled`)
+            fillTile(x);
+        });
+    }
 }
 
 //function to check if a row is filled, clear the row from filled tiles and reset background color to white and increment user score
@@ -202,25 +217,20 @@ function score() {
     let scoringTiles = [];
     let scoringTileRows = [];
     let numberOfScoringRows = 0;
+    //check if any rows are scoring, increment numberofscoringrows, push the scoring tiles, push the scoring rows
     allRowElements.forEach((rowElements) => {
-        //if all the tiles in the row are filled (in the filledTiles array) push the array into the scoringTiles array
-        if (rowElements.every((tile) => {
-                return filledTiles.includes(tile);
-            })) {
-                scoringTiles.push(rowElements);
-                scoringTileRows.push(rowElements[0][1]);
-                numberOfScoringRows++;
-            }
+        if(rowElements.every((x) => filledTiles.includes(x))){
+            numberOfScoringRows++;
+            scoringTiles = scoringTiles.concat(rowElements);
+            let scoringRow = rowElements[0][1];
+            scoringTileRows.push(scoringRow);
+            console.log(`detected scoring row elements are${rowElements}\ndetected scoring row is ${scoringRow}`);
+        }
+    scoringTiles.forEach((x) => emptyTile(x));
+    //sorting the scoring rows by descending so the highest row runs shiftTilesDown() first
+    scoringTileRows.sort((a,b) => b - a);
     })
-    //reset scoring tile color, remove from filledTiles array, shift all tiles above down
-    scoringTiles.forEach((row) => {
-        row.forEach((tile) => {
-            document.getElementById(tile).style.backgroundColor = 'white';
-            let tileIndex = filledTiles.findIndex((x) => {x === tile});
-            filledTiles.splice(tileIndex,1);
-        })
-        shiftTilesDown(row[0][1]);
-    })
+    scoringTileRows.forEach((x) => shiftTilesDown(x));
     switch(numberOfScoringRows){
         case 1:
             userScore += 40;
@@ -249,3 +259,11 @@ document.getElementById('replayButton').addEventListener('click', startGame);
 function debug1() {
     ['11','21','31','41','51','61','42','43','32','33','12','13','14'].forEach((x) => fillTile(x));
 }
+
+function debug3() {
+    console.log(`filledTiles are ${filledTiles}`);
+}
+
+document.getElementById('debug1').addEventListener('click',debug1);
+document.getElementById('debug2').addEventListener('click',debug2);
+document.getElementById('debug3').addEventListener('click',debug3);
