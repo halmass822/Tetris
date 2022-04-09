@@ -1,8 +1,11 @@
-//Generate a 7x9 grid, each element having its respective coordinate as its id
+//Generate a grid, each element having its respective coordinate as its id
 //Nested for loop, outer layer creates the row, inner loop fills the row with the tiles
 //All generated tiles get added to a generated tiles array
 //Grid will then be appended to an existing div
 let generatedTiles = [];
+let gridWidth = 10;
+let gridHeight = 20;
+
 
 function generateGrid(width, height){
     let output = document.createElement('div');
@@ -11,7 +14,7 @@ function generateGrid(width, height){
     output.style.display = 'inline-block';
     for( i = 0; i < height; i++ ){
         let row = document.createElement('div');
-        row.style.height = '52px';
+        row.style.height = '32px';
         for( j = 0; j < width; j++){
             let tileElement = document.createElement('p');
             //grid is created top-down so the id is calculated such that bottom left grid tile is 11, stored as a string
@@ -29,7 +32,7 @@ function generateGrid(width, height){
 }
 
 //creating the grid and appending to the target div
-document.getElementById('playingGrid').appendChild(generateGrid(7,9));
+document.getElementById('playingGrid').appendChild(generateGrid(gridWidth,gridHeight));
 
 //tile position represented by respective tile having a grey background color of #A9A9A9
 //function returns current tile position to white and updates current position and logs the change
@@ -96,7 +99,7 @@ function moveTile(movementInput) {
             }
             proposedPosition = proposedXCoord.toString() + proposedYCoord.toString();
             //checking if proposed position is out of bounds OR filled
-            if(proposedXCoord < 1 || proposedXCoord > 7 || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
+            if(proposedXCoord < 1 || proposedXCoord > gridWidth || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
                 console.log(`proposed position ${proposedPosition} is out of bounds or filled`);
                 return 'movement blocked';
             } else {
@@ -159,28 +162,23 @@ function startGame() {
 }
 
 
-//function to return an array of all elements in a particular row
-function getRowElements(targetRowHeight, gridWidth) {
-    let outputArray = [];
-    for( i = 0; i < gridWidth ; i++) {
-        let generatedElement = (i + 1).toString() + targetRowHeight.toString();
-        outputArray.push(generatedElement);
+//a 3D array of all the grid tile coordinates
+function getGridTiles(gridHeight, gridWidth) {
+    let outputArray = []
+    for( i = 0 ; i < gridHeight ; i ++){
+        let outputRow = []
+        for( j = 0 ; j < gridWidth ; j ++){
+            let outputTile = (j + 1).toString() + (gridHeight - i).toString();
+            outputRow.push(outputTile); 
+        }
+        outputArray.unshift(outputRow);
     }
     return outputArray;
 }
 
-//array of arrays of all the elements in the grid by row
-const row1Elements = getRowElements(1,7);
-const row2Elements = getRowElements(2,7);
-const row3Elements = getRowElements(3,7);
-const row4Elements = getRowElements(4,7);
-const row5Elements = getRowElements(5,7);
-const row6Elements = getRowElements(6,7);
-const row7Elements = getRowElements(7,7);
-const row8Elements = getRowElements(8,7);
-const row9Elements = getRowElements(9,7);
+console.log(getGridTiles(5,5));
 
-const allRowElements = [row1Elements, row2Elements, row3Elements, row4Elements, row5Elements, row6Elements, row7Elements, row8Elements, row9Elements];
+allRowElements = getGridTiles(gridHeight, gridWidth);
 
 //global variable for user's score and function to update it
 let userScore = 0;
