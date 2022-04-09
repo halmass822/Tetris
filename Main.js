@@ -53,7 +53,6 @@ function emptyTile(targetId) {
     targetElement.style.backgroundColor = 'white';
     let targetIndex = filledTiles.findIndex((x) => x === targetId);
     if(targetIndex >= 0){
-        console.log(`index ${targetIndex} to be spliced, element is ${filledTiles[targetIndex]}`);
         filledTiles.splice(targetIndex,1);
     }
 }
@@ -191,23 +190,26 @@ function updateScore() {
 
 //shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
 function shiftTilesDown(inputTargetRow){
-    console.log(`target row to shift down is ${inputTargetRow}`);
-    let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
-    console.log(`target tiles to shift down are ${targetTiles}`);
-    let newTilePositions = [];
-    targetTiles.forEach((x) => {
-        newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
-    });
-    console.log(`newTilePositions are ${newTilePositions}`);
-    console.log(`target tiles new positions are ${newTilePositions}`);
-    targetTiles.forEach((x) => {
-        emptyTile(x);
-    });
-    console.log(`newTilePositions are ${newTilePositions}`);
-    newTilePositions.forEach((x) => {
-        fillTile(x);
-    });
-
+    if(inputTargetRow.length > 0) {
+        console.log(`target row to shift down is ${inputTargetRow}`);
+        let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
+        console.log(`target tiles to shift down are ${targetTiles}`);
+        let newTilePositions = [];
+        targetTiles.forEach((x) => {
+            newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
+        });
+        console.log(`newTilePositions are ${newTilePositions}`);
+        console.log(`target tiles new positions are ${newTilePositions}`);
+        targetTiles.forEach((x) => {
+            console.log(`Tile ${x} emptied`)
+            emptyTile(x);
+        });
+        console.log(`newTilePositions are ${newTilePositions}`);
+        newTilePositions.forEach((x) => {
+            console.log(`Tile ${x} filled`)
+            fillTile(x);
+        });
+    }
 }
 
 //function to check if a row is filled, clear the row from filled tiles and reset background color to white and increment user score
@@ -227,9 +229,8 @@ function score() {
     scoringTiles.forEach((x) => emptyTile(x));
     //sorting the scoring rows by descending so the highest row runs shiftTilesDown() first
     scoringTileRows.sort((a,b) => b - a);
-    console.log(`scoringTileRows are ${scoringTileRows}`);
-    scoringTileRows.forEach((x) => shiftTilesDown(x));
     })
+    scoringTileRows.forEach((x) => shiftTilesDown(x));
     switch(numberOfScoringRows){
         case 1:
             userScore += 40;
