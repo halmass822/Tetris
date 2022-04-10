@@ -31,6 +31,53 @@ function generateGrid(width, height){
     return output;
 }
 
+//helper functions to turn the coordinate from an array to a string or vice versa
+function switchCoordinateFormat(input) {
+    if(input.isArray) {
+        return input.join('');
+    } else {
+        let output = input.toString();
+        return [output[0],output[1]];
+    }
+}
+
+function switchToArray(input) {
+    let output;
+    if(!Array.isArray(input)){
+        output = input.toString();
+    } else {
+        output = input.join('').toString();
+    }
+    return [output[0],output[1]];
+}
+
+function switchToString(input) {
+    switch(typeof input){
+        case 'object':
+            return input.join('')
+        break;
+        case 'number':
+            return input.toString();
+        break;
+        case 'string':
+            console.log(`attempting to switch a string into a string, operation ignored`);
+            return input;
+        break;
+        default:
+            console.log(`switchToString() error`);
+        break;
+    }    
+}
+
+console.log(switchToArray([1,2]));
+console.log(switchToArray(['1','2']));
+console.log(switchToArray('12'));
+console.log(switchToArray(12));
+console.log(switchToString([1,2]));
+console.log(switchToString(['1','2']));
+console.log(switchToString(12));
+console.log(switchToString('12'));
+
 //creating the grid and appending to the target div
 document.getElementById('playingGrid').appendChild(generateGrid(gridWidth,gridHeight));
 
@@ -70,7 +117,7 @@ function debug2() {
 //returns the new tile
 let movementAllowed = false;
 let filledTiles = [];
-let tetraminoPosition = '49';
+let tetraminoPosition = [5,20];
 function moveTile(movementInput) {
     if(movementAllowed) {
 
@@ -175,8 +222,6 @@ function getGridTiles(gridHeight, gridWidth) {
     }
     return outputArray;
 }
-
-console.log(getGridTiles(5,5));
 
 allRowElements = getGridTiles(gridHeight, gridWidth);
 
