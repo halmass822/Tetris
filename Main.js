@@ -105,9 +105,9 @@
                     default:
                         console.log(`error - check moveTilePropose() regex`);
                 }
-                console.log(`currentPosition is ${currentXCoord} ${currentYCoord}`);
+                //console.log(`currentPosition is ${currentXCoord} ${currentYCoord}`);
                 proposedPosition = digitize(proposedXCoord) + digitize(proposedYCoord);
-                console.log(`proposed position is ${proposedPosition}`)
+                //console.log(`proposed position is ${proposedPosition}`)
                 //checking if proposed position is out of bounds OR filled
                 if(proposedXCoord < 1 || proposedXCoord > gridWidth || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
                     console.log(`proposed position ${proposedPosition} is out of bounds or filled`);
@@ -169,6 +169,7 @@
             filledTiles = [];
         }
         tetraminoPosition = '0520';
+        changeToGrey(tetraminoPosition);
         userScore = 0;
         updateScore();
         console.log(`startGame() triggered`)
@@ -185,7 +186,7 @@
         for( i = 0 ; i < gridHeight ; i ++){
             let outputRow = []
             for( j = 0 ; j < gridWidth ; j ++){
-                let outputTile = (j + 1).toString() + (gridHeight - i).toString();
+                let outputTile = digitize(j + 1) + digitize(gridHeight - i);
                 outputRow.push(outputTile); 
             }
             outputArray.unshift(outputRow);
@@ -205,11 +206,11 @@
     function shiftTilesDown(inputTargetRow){
         if(inputTargetRow.length > 0) {
             console.log(`target row to shift down is ${inputTargetRow}`);
-            let targetTiles = filledTiles.filter((x) => (Number(x[1]) > inputTargetRow));
+            let targetTiles = filledTiles.filter((x) => (Number(x.slice(2,4)) > inputTargetRow));
             console.log(`target tiles to shift down are ${targetTiles}`);
             let newTilePositions = [];
             targetTiles.forEach((x) => {
-                newTilePositions.push(x[0].toString() + (Number(x[1]) - 1).toString());
+                newTilePositions.push(digitize(x.slice(0,2)) + digitize(Number(x.slice(2,4) - 1)));
             });
             console.log(`newTilePositions are ${newTilePositions}`);
             console.log(`target tiles new positions are ${newTilePositions}`);
@@ -263,16 +264,23 @@
         updateScore();
     }
 
-document.body.addEventListener('keypress', (event) => {moveTilePropose(event.key)});
+document.body.addEventListener('keypress', (event) => {
+    let proposedPosition = moveTilePropose(event.key);
+    if(proposedPosition) {
+        changeToWhite(tetraminoPosition);
+        tetraminoPosition = proposedPosition;
+        changeToGrey(tetraminoPosition);
+    }
+});
 document.getElementById('startButton').addEventListener('click', startGame);
 document.getElementById('replayButton').addEventListener('click', startGame);
 
 
 //DEBUGGING FUNCTIONS
 
-    //Fills tiles to quickly test scoring
+    //Fills bottom row to quickly test scoring
     function debug1() {
-        ['0101','0201','0301','0401','0501','0601','0402','0403','0302','0303','0102','0103','0104','0101','0110','1010'].forEach((x) => fillTile(x));
+        ["0101","0201","0301","0401","0501","0601","0701","0801","0901","1001"].forEach((x) => fillTile(x));
     }
 
     //Empties a set of tiles to test emptyTile
@@ -289,8 +297,20 @@ document.getElementById('replayButton').addEventListener('click', startGame);
         console.log(`score is ${userScore}`);
     }
 
+    //fills positions in a randomized order
+    function debug4(numOfTilesRequested) {
+        randomizedTileArray = [];
+        for( i = 0; i < numOfTilesRequested ; i++){
+            let generatedTile = digitize(Math.floor(Math.random() * 9.999 + 1)) + digitize(Math.floor(Math.random() * 19.999 + 1));
+            randomizedTileArray.push(generatedTile);
+        }
+        console.log(`generated tiles in debug4 are ${generatedTiles}`);
+        randomizedTileArray.forEach(x => fillTile(x));
+    }
+
 
 
 document.getElementById('debug1').addEventListener('click',debug1);
 document.getElementById('debug2').addEventListener('click',debug2);
 document.getElementById('debug3').addEventListener('click',debug3);
+document.getElementById('debug4').addEventListener('click',() => debug4(10));
