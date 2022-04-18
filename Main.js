@@ -70,6 +70,7 @@
             target.style.backgroundColor = "white";
         }
 
+
 //creating the grid and appending to the target div
     document.getElementById('playingGrid').appendChild(generateGrid(gridWidth,gridHeight));
 
@@ -79,13 +80,13 @@
     let movementAllowed = false;
     let filledTiles = [];
     let tetraminoPosition = '0520';
-    function moveTilePropose(movementInput) {
+    function moveTilePropose(currentPosition,movementInput) {
         if(movementAllowed) {
 
             if(/[asd]/.test(movementInput)){
                 
-                let currentXCoord = Number(tetraminoPosition.slice(0,2));
-                let currentYCoord = Number(tetraminoPosition.slice(2,4));
+                let currentXCoord = Number(currentPosition.slice(0,2));
+                let currentYCoord = Number(currentPosition.slice(2,4));
                 let proposedXCoord;
                 let proposedYCoord;
                 let proposedPosition;
@@ -128,7 +129,9 @@
 //function to move the tetra down, filling the position if the movement fails (if moveTilePropose('s') returns null)
 //ends the game if the tile stops at position '0520'
     function dropTile() {
-        let newPosition = moveTilePropose('s');
+        tetraminoPosition.forEach((x) => {
+            proposedPosition = moveTilePropose(x,'s');
+        })//***********switching dropTile to accept an array
         if(newPosition){
             changeToWhite(tetraminoPosition);
             changeToGrey(newPosition);
@@ -163,13 +166,8 @@
 //function resets tile position to 49, clears all the tile backgrounds back to white, hides the game over / game title screen and starts the tile falling
     function startGame() {
         generatedTiles.forEach((x) => emptyTile(x));
-        //quick test to ensure all filledTiles are emptied
-        if(filledTiles.length > 0) {
-            console.log(`startGame() failed to empty filledTiles array, backup engaged`);
-            filledTiles = [];
-        }
-        tetraminoPosition = '0520';
-        changeToGrey(tetraminoPosition);
+        tetraminoPosition = ['0520','0620','0519','0619'];
+        tetraminoPosition.forEach(x => changeToGrey(x));
         userScore = 0;
         updateScore();
         console.log(`startGame() triggered`)
