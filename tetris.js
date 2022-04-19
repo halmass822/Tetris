@@ -289,7 +289,7 @@ document.getElementById('replayButton').addEventListener('click', startGame);
 
     //Empties a set of tiles to test emptyTile
     function debug2() {
-        ['0101','0202','0302','0701','0101','0110','1010'].forEach((x) => emptyTile(x));
+        generatedTiles.forEach((x) => emptyTile(x));
         console.log(`resultant filledTiles are ${filledTiles}`);
     }
 
