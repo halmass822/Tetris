@@ -79,44 +79,48 @@
 //returns the proposed coordinate if the movement is possible, returns null otherwise - next function executes the move
     let movementAllowed = false;
     let filledTiles = [];
-    let tetraminoPosition = '0520';
+    let tetraminoPosition = [];
     function moveTilePropose(currentPosition,movementInput) {
+        let output = [];
         if(movementAllowed) {
 
             if(/[asd]/.test(movementInput)){
-                
-                let currentXCoord = Number(currentPosition.slice(0,2));
-                let currentYCoord = Number(currentPosition.slice(2,4));
-                let proposedXCoord;
-                let proposedYCoord;
-                let proposedPosition;
-                switch(movementInput) {
-                    case 'a':
-                        proposedXCoord = currentXCoord - 1;
-                        proposedYCoord = currentYCoord;
-                        break;
-                    case 'd':
-                        proposedXCoord = currentXCoord + 1;
-                        proposedYCoord = currentYCoord;
-                        break;     
-                    case 's':
-                        proposedXCoord = currentXCoord;
-                        proposedYCoord = currentYCoord - 1;
-                        break;              
-                    default:
-                        console.log(`error - check moveTilePropose() regex`);
-                }
-                //console.log(`currentPosition is ${currentXCoord} ${currentYCoord}`);
-                proposedPosition = digitize(proposedXCoord) + digitize(proposedYCoord);
-                //console.log(`proposed position is ${proposedPosition}`)
-                //checking if proposed position is out of bounds OR filled
-                if(proposedXCoord < 1 || proposedXCoord > gridWidth || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
-                    console.log(`proposed position ${proposedPosition} is out of bounds or filled`);
+                currentPosition.forEach((tile) => {
+                    let currentXCoord = Number(tile.slice(0,2));
+                    let currentYCoord = Number(tile.slice(2,4));
+                    let proposedXCoord;
+                    let proposedYCoord;
+                    let proposedPosition;
+                    switch(movementInput) {
+                        case 'a':
+                            proposedXCoord = currentXCoord - 1;
+                            proposedYCoord = currentYCoord;
+                            break;
+                        case 'd':
+                            proposedXCoord = currentXCoord + 1;
+                            proposedYCoord = currentYCoord;
+                            break;     
+                        case 's':
+                            proposedXCoord = currentXCoord;
+                            proposedYCoord = currentYCoord - 1;
+                            break;              
+                        default:
+                            console.log(`error - check moveTilePropose() regex`);
+                    }
+                    proposedPosition = digitize(proposedXCoord) + digitize(proposedYCoord);
+                    if(proposedXCoord < 1 || proposedXCoord > gridWidth || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
+                        output.push(null);
+                    } else {
+                        output.push(proposedPosition);
+                    }
+                })
+                if(output.some((tile) => {
+                    return tile === null;
+                })){
                     return null;
                 } else {
-                    return proposedPosition;
+                    return output;
                 }
-
             } else {
                 console.log(`input "${movementInput}" ignored`);
             }
@@ -129,18 +133,19 @@
 //function to move the tetra down, filling the position if the movement fails (if moveTilePropose('s') returns null)
 //ends the game if the tile stops at position '0520'
     function dropTile() {
-        tetraminoPosition.forEach((x) => {
-            proposedPosition = moveTilePropose(x,'s');
-        })//***********switching dropTile to accept an array
+        let newPosition = moveTilePropose(tetraminoPosition,'s');
         if(newPosition){
-            changeToWhite(tetraminoPosition);
-            changeToGrey(newPosition);
-            tetraminoPosition = newPosition;
+            tetraminoPosition.forEach((tile) => {
+                changeToWhite(tile);
+            })
+            newPosition.forEach((tile) => {
+                changeToGrey(tile);
+                tetraminoPosition = newPosition;
+            })
         } else {
-            console.log(`movement blocked, position ${tetraminoPosition} is now filled`);
-            fillTile(tetraminoPosition);
-            tetraminoPosition = '0520';
-            changeToGrey(tetraminoPosition);
+            tetraminoPosition.forEach((x) => fillTile(x));
+            tetraminoPosition = ['0520','0620','0519','0619'];
+            tetraminoPosition.forEach((x) => changeToGrey(x));
         }
         //runs the score function, which checks if any rows are filled, eliminates the filled row tiles and shift the tiles above down
         score();
@@ -262,12 +267,13 @@
         updateScore();
     }
 
+//event listeners
 document.body.addEventListener('keypress', (event) => {
-    let proposedPosition = moveTilePropose(event.key);
+    let proposedPosition = moveTilePropose(tetraminoPosition,event.key);
     if(proposedPosition) {
-        changeToWhite(tetraminoPosition);
+        tetraminoPosition.forEach((x) => changeToWhite(x));
         tetraminoPosition = proposedPosition;
-        changeToGrey(tetraminoPosition);
+        tetraminoPosition.forEach((x) => changeToGrey(x));
     }
 });
 document.getElementById('startButton').addEventListener('click', startGame);
