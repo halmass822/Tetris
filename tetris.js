@@ -387,6 +387,7 @@ document.getElementById('replayButton').addEventListener('click', startGame);
         console.log(`generated tiles in debug4 are ${generatedTiles}`);
         randomizedTileArray.forEach(x => fillTile(x));
         ['0520','0519','0518','0517','0620','0619','0618','0617'].forEach((x) => emptyTile(x));
+        tetraminoPosition.forEach((x) => changeToGrey(x));
     }
 
 
