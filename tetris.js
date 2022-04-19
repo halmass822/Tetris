@@ -149,10 +149,13 @@
         }
         //runs the score function, which checks if any rows are filled, eliminates the filled row tiles and shift the tiles above down
         score();
-        if(filledTiles.includes('0520')){
+        if(tetraminoPosition.some((x) => {
+            return filledTiles.includes(x);
+        })){
             movementAllowed = false;
             fallingState(false);
             document.getElementById('gameOverScreen').style.display = 'block';
+
         }
     }
 
