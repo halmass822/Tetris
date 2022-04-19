@@ -144,8 +144,8 @@
             })
         } else {
             tetraminoPosition.forEach((x) => fillTile(x));
-            tetraminoPosition = ['0520','0620','0519','0619'];
-            tetraminoPosition.forEach((x) => changeToGrey(x));
+            tetraminoPosition = drawShape('0619',randomShape());
+            tetraminoPosition.forEach(x => changeToGrey(x));
         }
         //runs the score function, which checks if any rows are filled, eliminates the filled row tiles and shift the tiles above down
         score();
@@ -171,7 +171,7 @@
 //function resets tile position to 49, clears all the tile backgrounds back to white, hides the game over / game title screen and starts the tile falling
     function startGame() {
         generatedTiles.forEach((x) => emptyTile(x));
-        tetraminoPosition = ['0520','0620','0519','0619'];
+        tetraminoPosition = drawShape('0619',randomShape());
         tetraminoPosition.forEach(x => changeToGrey(x));
         userScore = 0;
         updateScore();
@@ -198,6 +198,82 @@
     }
 
     allRowElements = getGridTiles(gridHeight, gridWidth);
+
+//drawing the tetramino shapes and each rotation. coordinates are relative with the origin being 0,0 stored as 3D arrays including every rotation
+    //box - all rotations are identical
+    const  box = [
+        [ [-1,0],[0,0],[0,-1],[-1,-1] ],
+        [ [-1,0],[0,0],[0,-1],[-1,-1] ],
+        [ [-1,0],[0,0],[0,-1],[-1,-1] ],
+        [ [-1,0],[0,0],[0,-1],[-1,-1] ]
+    ]
+    //column - every other rotation is identical
+    const column = [
+        [ [-1,0],[0,0],[1,0],[2,0] ],
+        [ [0,1],[0,0],[0.-1],[0,-2] ],
+        [ [-1,0],[0,0],[1,0],[2,0] ],
+        [ [0,1],[0,0],[0.-1],[0,-2] ],
+    ]
+    //bolts - 2 forms, every other rotation is identical
+    const bolt1 = [
+        [ [-1,0],[0,0],[0,-1],[1,-1] ],
+        [ [0,1],[0,0],[-1,0],[-1,-1] ],
+        [ [-1,0],[0,0],[0,-1],[1,-1] ],
+        [ [0,1],[0,0],[-1,0],[-1,-1] ],
+    ]
+
+    const bolt2 = [
+        [ [-1,0],[0,0],[0,1],[1,1] ],
+        [ [0,1],[0,0],[1,0],[1,-1] ],
+        [ [-1,0],[0,0],[0,1],[1,1] ],
+        [ [0,1],[0,0],[1,0],[1,-1] ],
+    ]
+
+    //bed - 2 forms, 4 separate rotations
+    const bed1 = [
+        [ [-1,1],[-1,0],[0,0],[1,0] ],
+        [ [0,-2],[0,-1],[0,0],[1,0] ],
+        [ [-2,0],[-1,0],[0,0],[0,-1] ],
+        [ [-1,0],[0,0],[0,1],[0,2] ]
+    ]
+
+    const bed2 = [
+        [ [-1,0],[0,0],[1,0],[1,1] ],
+        [ [0,1],[0,0],[0,-1],[1,-1] ],
+        [ [-1,-1],[-1,0],[0,0],[1,0] ],
+        [ [-1,1],[0,1],[0,0],[0,-1] ]
+
+    ]
+
+    //cross - 4 separate rotations
+
+    const cross = [
+        [ [-1,0],[0,0],[0,1],[1,0] ],
+        [ [0,1],[0,0],[1,0],[0,-1] ],
+        [ [-1,0],[0,0],[0,-1],[1,0] ],
+        [ [0,1],[0,0],[-1,0],[0,-1] ]
+    ]
+
+    const shapes =[box,column,bed1,bed2,bolt1,bolt2,cross];
+
+    //returns first rotation of a random shape
+    function randomShape() {
+        return shapes[Math.floor(Math.random() * (shapes.length - 0.001))][0];
+    }
+
+    //draws the shape based on a given origin point - returns an array or coordinates if all tiles are valid, otherwise returns null
+    function drawShape(origin, shape) {
+        let shapeCoordinates = [];
+        originXCoord = Number(origin.slice(0,2));
+        originYCoord = Number(origin.slice(2,4));
+        shape.forEach((x) => {
+            let tileCoord = digitize(originXCoord + x[0]) + digitize(originYCoord + x[1]);
+            shapeCoordinates.push(tileCoord);
+        })
+        console.log(`drawing ${shape}\ntile coordinates are ${shapeCoordinates}`);
+        return shapeCoordinates;
+    }
+
 
 //global variable for user's score and function to update it
     let userScore = 0;
@@ -287,7 +363,7 @@ document.getElementById('replayButton').addEventListener('click', startGame);
         ["0101","0201","0301","0401","0501","0601","0701","0801","0901","1001"].forEach((x) => fillTile(x));
     }
 
-    //Empties a set of tiles to test emptyTile
+    //Empties all grid tiles
     function debug2() {
         generatedTiles.forEach((x) => emptyTile(x));
         console.log(`resultant filledTiles are ${filledTiles}`);
@@ -301,7 +377,7 @@ document.getElementById('replayButton').addEventListener('click', startGame);
         console.log(`score is ${userScore}`);
     }
 
-    //fills positions in a randomized order
+    //fills positions in a randomized order excluding the center top tiles
     function debug4(numOfTilesRequested) {
         randomizedTileArray = [];
         for( i = 0; i < numOfTilesRequested ; i++){
@@ -310,6 +386,7 @@ document.getElementById('replayButton').addEventListener('click', startGame);
         }
         console.log(`generated tiles in debug4 are ${generatedTiles}`);
         randomizedTileArray.forEach(x => fillTile(x));
+        ['0520','0519','0518','0517','0620','0619','0618','0617'].forEach((x) => emptyTile(x));
     }
 
 
