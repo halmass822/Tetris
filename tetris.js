@@ -42,6 +42,22 @@
             }
         }
 
+    //checking if any of the coordinate arrays are out of bounds or filled
+        function checkCoordinates(inputArray) {
+            console.log(inputArray);
+            return !(inputArray.some((coordinate) => {
+                    let XCoordinate = coordinate.slice(0,2);
+                    let YCoordinate = coordinate.slice(2,4);
+                    console.log(filledTiles.includes(coordinate));
+                    console.log(XCoordinate < 1);
+                    console.log(XCoordinate > gridWidth);
+                    console.log(YCoordinate < 1);
+                    console.log(YCoordinate > gridHeight);
+                    return(filledTiles.includes(coordinate) || XCoordinate < 1 || XCoordinate > gridWidth || YCoordinate < 1 || YCoordinate > gridHeight)
+                })
+            )
+        }
+
     //helper functions for recoloring and filling the represented tile
         function fillTile(targetId) {
             targetElement = document.getElementById(targetId);
@@ -84,47 +100,51 @@
         let output = [];
         if(movementAllowed) {
 
-            if(/[asd]/.test(movementInput)){
-                currentPosition.forEach((tile) => {
-                    let currentXCoord = Number(tile.slice(0,2));
-                    let currentYCoord = Number(tile.slice(2,4));
-                    let proposedXCoord;
-                    let proposedYCoord;
-                    let proposedPosition;
-                    switch(movementInput) {
-                        case 'a':
-                            proposedXCoord = currentXCoord - 1;
-                            proposedYCoord = currentYCoord;
-                            break;
-                        case 'd':
-                            proposedXCoord = currentXCoord + 1;
-                            proposedYCoord = currentYCoord;
-                            break;     
-                        case 's':
-                            proposedXCoord = currentXCoord;
-                            proposedYCoord = currentYCoord - 1;
-                            break;              
-                        default:
-                            console.log(`error - check moveTilePropose() regex`);
-                    }
-                    proposedPosition = digitize(proposedXCoord) + digitize(proposedYCoord);
-                    if(proposedXCoord < 1 || proposedXCoord > gridWidth || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
-                        output.push(null);
-                    } else {
-                        output.push(proposedPosition);
-                    }
-                })
-                if(output.some((tile) => {
-                    return tile === null;
-                })){
-                    return null;
-                } else {
-                    return output;
-                }
+            if(movementInput === 'w'){
+                rotateShape()
             } else {
-                console.log(`input "${movementInput}" ignored`);
-            }
 
+                if(/[asd]/.test(movementInput)){
+                    currentPosition.forEach((tile) => {
+                        let currentXCoord = Number(tile.slice(0,2));
+                        let currentYCoord = Number(tile.slice(2,4));
+                        let proposedXCoord;
+                        let proposedYCoord;
+                        let proposedPosition;
+                        switch(movementInput) {
+                            case 'a':
+                                proposedXCoord = currentXCoord - 1;
+                                proposedYCoord = currentYCoord;
+                                break;
+                            case 'd':
+                                proposedXCoord = currentXCoord + 1;
+                                proposedYCoord = currentYCoord;
+                                break;     
+                            case 's':
+                                proposedXCoord = currentXCoord;
+                                proposedYCoord = currentYCoord - 1;
+                                break;
+                            default:
+                                console.log(`error - check moveTilePropose() regex`);
+                        }
+                        proposedPosition = digitize(proposedXCoord) + digitize(proposedYCoord);
+                        if(proposedXCoord < 1 || proposedXCoord > gridWidth || proposedYCoord < 1 || filledTiles.includes(proposedPosition)) {
+                            output.push(null);
+                        } else {
+                            output.push(proposedPosition);
+                        }
+                    })
+                    if(output.some((tile) => {
+                        return tile === null;
+                    })){
+                        return null;
+                    } else {
+                        return output;
+                    }
+                } else {
+                    console.log(`input "${movementInput}" ignored`);
+                }
+            }
         } else {
             console.log(`movement disallowed, input ignored`);
         }
@@ -144,7 +164,9 @@
             })
         } else {
             tetraminoPosition.forEach((x) => fillTile(x));
-            tetraminoPosition = drawShape('0619',randomShape());
+            currentShape = randomShape();
+            currentRotation = 0;
+            tetraminoPosition = drawShape('0619',currentShape[0]);
             tetraminoPosition.forEach(x => changeToGrey(x));
         }
         //runs the score function, which checks if any rows are filled, eliminates the filled row tiles and shift the tiles above down
@@ -174,7 +196,9 @@
 //function resets tile position to 49, clears all the tile backgrounds back to white, hides the game over / game title screen and starts the tile falling
     function startGame() {
         generatedTiles.forEach((x) => emptyTile(x));
-        tetraminoPosition = drawShape('0619',randomShape());
+        currentShape = randomShape();
+        currentRotation = 0;
+        tetraminoPosition = drawShape('0619',currentShape[0]);
         tetraminoPosition.forEach(x => changeToGrey(x));
         userScore = 0;
         updateScore();
@@ -213,9 +237,9 @@
     //column - every other rotation is identical
     const column = [
         [ [-1,0],[0,0],[1,0],[2,0] ],
-        [ [0,1],[0,0],[0.-1],[0,-2] ],
+        [ [0,1],[0,0],[0,-1],[0,-2] ],
         [ [-1,0],[0,0],[1,0],[2,0] ],
-        [ [0,1],[0,0],[0.-1],[0,-2] ],
+        [ [0,1],[0,0],[0,-1],[0,-2] ],
     ]
     //bolts - 2 forms, every other rotation is identical
     const bolt1 = [
@@ -261,7 +285,7 @@
 
     //returns first rotation of a random shape
     function randomShape() {
-        return shapes[Math.floor(Math.random() * (shapes.length - 0.001))][0];
+        return shapes[Math.floor(Math.random() * (shapes.length - 0.001))];
     }
 
     //draws the shape based on a given origin point - returns an array or coordinates if all tiles are valid, otherwise returns null
@@ -277,6 +301,23 @@
         return shapeCoordinates;
     }
 
+    var currentShape;
+    var currentRotation;
+
+    function rotateShape() {
+        //returns the next form of the current shape, meaning the next index of the current shape
+        let newRotation = ((currentRotation + 1)%4)
+        let shapeToDraw = currentShape[newRotation];
+        let newShapeCoordinates = drawShape(tetraminoPosition[1], shapeToDraw);
+        if(checkCoordinates(newShapeCoordinates)){
+            tetraminoPosition.forEach((x) => changeToWhite(x));
+            tetraminoPosition = newShapeCoordinates;
+            currentRotation = newRotation;
+            tetraminoPosition.forEach((x) => changeToGrey(x));
+        } else {
+            console.log(`rotation invalid, ignoring input`);
+        }
+    }
 
 //global variable for user's score and function to update it
     let userScore = 0;
