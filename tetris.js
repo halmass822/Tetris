@@ -44,15 +44,9 @@
 
     //checking if any of the coordinate arrays are out of bounds or filled
         function checkCoordinates(inputArray) {
-            console.log(inputArray);
             return !(inputArray.some((coordinate) => {
                     let XCoordinate = coordinate.slice(0,2);
                     let YCoordinate = coordinate.slice(2,4);
-                    console.log(filledTiles.includes(coordinate));
-                    console.log(XCoordinate < 1);
-                    console.log(XCoordinate > gridWidth);
-                    console.log(YCoordinate < 1);
-                    console.log(YCoordinate > gridHeight);
                     return(filledTiles.includes(coordinate) || XCoordinate < 1 || XCoordinate > gridWidth || YCoordinate < 1 || YCoordinate > gridHeight)
                 })
             )
@@ -174,6 +168,7 @@
         if(tetraminoPosition.some((x) => {
             return filledTiles.includes(x);
         })){
+            console.log(`game over triggered`)
             movementAllowed = false;
             fallingState(false);
             document.getElementById('gameOverScreen').style.display = 'block';
@@ -297,7 +292,6 @@
             let tileCoord = digitize(originXCoord + x[0]) + digitize(originYCoord + x[1]);
             shapeCoordinates.push(tileCoord);
         })
-        console.log(`drawing ${shape}\ntile coordinates are ${shapeCoordinates}`);
         return shapeCoordinates;
     }
 
@@ -328,22 +322,15 @@
 //shift all tiles of a row down by one, inputting the row height that was removed - all tiles above it will be shifted down
     function shiftTilesDown(inputTargetRow){
         if(inputTargetRow.length > 0) {
-            console.log(`target row to shift down is ${inputTargetRow}`);
             let targetTiles = filledTiles.filter((x) => (Number(x.slice(2,4)) > inputTargetRow));
-            console.log(`target tiles to shift down are ${targetTiles}`);
             let newTilePositions = [];
             targetTiles.forEach((x) => {
                 newTilePositions.push(digitize(x.slice(0,2)) + digitize(Number(x.slice(2,4) - 1)));
             });
-            console.log(`newTilePositions are ${newTilePositions}`);
-            console.log(`target tiles new positions are ${newTilePositions}`);
             targetTiles.forEach((x) => {
-                console.log(`Tile ${x} emptied`)
                 emptyTile(x);
             });
-            console.log(`newTilePositions are ${newTilePositions}`);
             newTilePositions.forEach((x) => {
-                console.log(`Tile ${x} filled`)
                 fillTile(x);
             });
         }
@@ -361,7 +348,6 @@
                 scoringTiles = scoringTiles.concat(rowElements);
                 let scoringRow = rowElements[0][1];
                 scoringTileRows.push(scoringRow);
-                console.log(`detected scoring row elements are${rowElements}\ndetected scoring row is ${scoringRow}`);
             }
         scoringTiles.forEach((x) => emptyTile(x));
         //sorting the scoring rows by descending so the highest row runs shiftTilesDown() first
@@ -410,7 +396,6 @@ document.getElementById('replayButton').addEventListener('click', startGame);
     //Empties all grid tiles
     function debug2() {
         generatedTiles.forEach((x) => emptyTile(x));
-        console.log(`resultant filledTiles are ${filledTiles}`);
     }
 
     //Prints most global variables
@@ -428,7 +413,6 @@ document.getElementById('replayButton').addEventListener('click', startGame);
             let generatedTile = digitize(Math.floor(Math.random() * 9.999 + 1)) + digitize(Math.floor(Math.random() * 19.999 + 1));
             randomizedTileArray.push(generatedTile);
         }
-        console.log(`generated tiles in debug4 are ${generatedTiles}`);
         randomizedTileArray.forEach(x => fillTile(x));
         ['0520','0519','0518','0517','0620','0619','0618','0617'].forEach((x) => emptyTile(x));
         tetraminoPosition.forEach((x) => changeToGrey(x));
